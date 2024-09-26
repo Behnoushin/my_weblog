@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
 
-from .models import Post
-from .serializers import PostSerializers
+from .models import Post, Comment
+from .serializers import PostSerializers, CommentSerializer
 
 class PostListView(generics.ListCreateAPIView):
     queryset= Post.objects.all()
@@ -16,6 +16,19 @@ class PostListView(generics.ListCreateAPIView):
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset= Post.objects.all()
     serializer_class = PostSerializers
+
+class CommentListView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    
+    def perform_create(self, serializer):
+        post_id = self.request.data.get('post')
+        post = Post.objects.get(id=post_id)
+        serializer.save(post=post)
+        
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
     
 #--------------------------
 #بر اساس mixins
